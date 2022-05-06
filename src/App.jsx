@@ -1,41 +1,59 @@
-import { useState } from 'react'
-import logo from './logo.svg'
+import { useState,useEffect } from 'react'
 import './App.css'
+import {Heading} from '@chakra-ui/react'
+import {VStack, IconButton, useColorMode } from '@chakra-ui/react'
+import {FaSun, FaMoon} from 'react-icons/fa'
+import TodoList from './components/TodoList'
+import AddTodo from './components/AddTodo'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const initialTodo= [
+    {
+      id: 1,
+      body: 'get asdasd'
+    }
+    ,{
+      id: 2,
+      body: 'get butter'
+    }
+  ]
+
+  const [todos, setTodos]= useState( () => JSON.parse(localStorage.getItem('todos')) || []);
+
+  useEffect(() => {
+    localStorage.setItem('todos', JSON.stringify(todos));
+  }, [todos]);
+
+
+  function todoDelete(id){
+    const newTodos = todos.filter((todo)=>{
+      return todo.id!==id;
+    });
+    setTodos(newTodos)
+  }
+
+  function addTodo(todo)
+  {
+    setTodos([...todos, todo]);
+
+  }
+  
+  const { colorMode, toggleColorMode } = useColorMode();
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello Vite + React!</p>
-        <p>
-          <button type="button" onClick={() => setCount((count) => count + 1)}>
-            count is: {count}
-          </button>
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {' | '}
-          <a
-            className="App-link"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Vite Docs
-          </a>
-        </p>
-      </header>
-    </div>
+    <VStack p={4}>
+      <IconButton 
+        icon={colorMode === 'light' ? <FaSun /> : <FaMoon />}
+        isRound="true" 
+        size="lg" 
+        alignSelf="flex-end"
+        onClick={toggleColorMode}
+        />
+   <Heading mb="8" fontWeight="extrabold" size="2xl" bgGradient="linear(to-r,pink.500, pink.300,blue.500)" bgClip="text">Todo Application</Heading>
+  <TodoList todos={todos} todoDelete={todoDelete}/>
+ <AddTodo addTodo={addTodo}/>
+   </VStack>
+
   )
 }
 
